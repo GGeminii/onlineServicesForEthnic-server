@@ -1,0 +1,138 @@
+#server
+server:
+    port: 7059
+    servlet:
+        session:
+            #cookie接收(支持跨域，https传输)
+            cookie:
+                http-only: true
+                secure: true
+                same-site: None
+
+spring:
+    mvc:
+        static-path-pattern: /static/**
+    #quartz
+    quartz:
+        job-store-type: jdbc
+        #仅在第一次启动时开启用于初始化quartz的持久化数据库设置为always，之后设置为never
+        jdbc:
+            initialize-schema: never
+        properties:
+            org:
+                quartz:
+                    scheduler:
+                        instanceName: onlineServicesForEthnic
+                threadPool:
+                    threadCount: 5
+    #开发环境
+    profiles:
+        active: dev
+    servlet:
+        #文件传输限制
+        multipart:
+            max-file-size: 30MB
+            max-request-size: 30MB
+    #数据库配置
+    datasource:
+        driver-class-name: ${onlineServicesForEthnic.datasource.driver-class-name}
+        url: jdbc:mysql://${onlineServicesForEthnic.datasource.host}:${onlineServicesForEthnic.datasource.port}/${onlineServicesForEthnic.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+        username: ${onlineServicesForEthnic.datasource.username}
+        password: ${onlineServicesForEthnic.datasource.password}
+    #redis
+    data:
+        redis:
+            host: ${onlineServicesForEthnic.redis.host}
+            port: ${onlineServicesForEthnic.redis.port}
+            password: ${onlineServicesForEthnic.redis.password}
+            lettuce:
+                pool:
+                    max-active: 10
+                    max-idle: 10
+                    min-idle: 1
+                    time-between-eviction-runs: 10s
+
+#mybatis-log
+logging:
+    level:
+        com.fms.mapper: debug
+        org.springframework.security.authentication: DEBUG
+
+#OSS配置
+aliyun:
+    oss:
+        endpoint: ${onlineServicesForEthnic.aliyun.oss.endpoint}
+        accessKeyId: ${onlineServicesForEthnic.aliyun.oss.accessKeyId}
+        accessKeySecret: ${onlineServicesForEthnic.aliyun.oss.accessKeySecret}
+        bucketName: ${onlineServicesForEthnic.aliyun.oss.bucketName}
+
+
+#springdoc相关配置
+springdoc:
+    swagger-ui:
+        #swagger前端请求路径
+        path: /swagger-ui.html
+        tags-sorter: alpha
+        operations-sorter: alpha
+    api-docs:
+        #swagger后端请求地址
+        path: /v3/api-docs
+        #是否开启文档功能
+        enabled: true
+    group-configs:
+        -   group: 'default'
+            display-name: 'onlineServicesForEthnic'
+            paths-to-match: '/**'
+            #按包路径匹配
+            packages-to-scan: com.onlineServicesForEthnic
+    default-flat-param-object: true
+
+#knife4j相关配置
+knife4j:
+    #开启knife4j增强
+    enable: true
+    setting:
+        #中文
+        language: zh_cn
+        #重命名SwaggerModel名称
+        swagger-model-name: 实体类
+    #开启Swagger的Basic认证功能（暂时为false）
+    basic:
+        enable: false
+        # Basic认证用户名
+        username: admin
+        # Basic认证密码
+        password: 123456
+
+#mybatis-flex
+mybatis-flex:
+    configuration:
+        map-underscore-to-camel-case: true
+    mapper-locations:
+        - classpath*:/mapper/*.xml
+    type-aliases-package: com.onlineServicesForEthnic.entity
+    global-config:
+        print-banner: true
+        normal-value-of-logic-delete: 0
+        deleted-value-of-logic-delete: 1
+        logic-delete-column: "is_delete"
+
+
+
+#自定义配置
+onlineServicesForEthnic:
+    #默认头像地址
+    default:
+        image-url: ${onlineServicesForEthnic.default.image-url}
+    remember-me:
+        #记住登录状态的时间（秒）
+        tokenValiditySeconds: 1000000
+    session:
+        #一个账号允许存在的最大会话数
+        maximumSessions: 1
+    jwt:
+        #jwt秘钥
+        secret: onlineServicesForEthnic
+        #jwt有效时间（秒）
+        expiration: 1000000
+
